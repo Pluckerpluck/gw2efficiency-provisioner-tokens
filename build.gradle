@@ -1,0 +1,43 @@
+plugins {
+  id "com.moowork.node" version "1.1.1"
+  id "de.richsource.gradle.plugins.typescript" version "1.8.0"
+}
+
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.variant.VariantBuilder
+
+node {
+  download = true
+}
+
+String nodeExecutable() {
+  NodeExtension nodeExt = NodeExtension.get(project)
+  return new VariantBuilder(nodeExt).build().nodeExec
+}
+
+task tslint(type: NodeTask, dependsOn: "npmInstall") {
+  script = project.file('node_modules/tslint/lib/tslint-cli.js')
+  args = ["src/**/*.ts"]
+  inputs.files(fileTree("${projectDir}/src"))
+  outputs.files file("${buildDir}/reports/tslint.out")
+}
+
+// This is from the typescript plugin and provides configuration
+compileTypeScript {
+  compilerExecutable "${nodeExecutable()} node_modules/typescript/lib/tsc.js"
+  dependsOn "tslint"
+  projectFile file("${projectDir}")
+  source file("${projectDir}/src")
+}
+
+task rollup(type: Exec, dependsOn: "compileTypeScript") {
+  workingDir = file("${buildDir}/ts")
+
+  executable = project.file('node_modules/rollup/bin/rollup');
+  args = ["main.js", "-o", "../bundle.js", "--f", "iife"]
+
+  inputs.files(fileTree("${buildDir}/ts"))
+  outputs.files file("${buildDir}/bundle.js")
+}
+
+task build(dependsOn: "rollup")

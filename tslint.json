@@ -1,0 +1,31 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "interface-name": [
+            true,
+            "never-prefix"
+        ],
+        "no-console": false,
+        "indent": [
+            true,
+            "tabs"
+        ]
+    },
+    "no-shadowed-variable": [
+        true,
+        {
+            "class": true,
+            "enum": true,
+            "function": true,
+            "interface": false,
+            "namespace": true,
+            "typeAlias": false,
+            "typeParameter": false
+        }
+    ],
+    "rulesDirectory": []
+}
